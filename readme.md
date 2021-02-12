@@ -1,3 +1,6 @@
+
+Это пример файла для работы с последовательным портом
+
 # Serial-Macros (sMacros)
 
 Use your Serial inteface with arduino to execute macro keys
