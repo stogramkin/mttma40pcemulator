@@ -1,0 +1,119 @@
+; Sample macro for Tera Term
+;  Dial-up login
+
+; open Tera Term
+;   command line = 'TERATERM /C=1' (COM1 port)
+;connect '/C=1'
+
+;DialPrefix = 'ATD'
+
+; set phone number, username, and password
+;PhoneNumber = '0000000000'
+;UsernamePrompt = 'Username:'
+;Username = 'MYNAME'
+;PasswordPrompt = 'Password:'
+; get password from file
+;getpassword 'password.dat' 'mypassword' Password
+
+; initialize modem (see the manual for your modem)
+;sendln  'ATZ'
+connect '/C=1'
+
+
+inputbox 'Directory to store files:' 'Set directory'
+setdir inputstr
+getdir dir
+messagebox dir 'File saved to:' 
+
+
+
+:waitstr
+waitln ':F MET' ':F EXP' ':F RES' ':F TAB' ':F CON'
+
+if result=1 call A_RDY 
+if result=2 call A_RDY 
+if result=3 call A_RDY 
+if result=4 call A_RDY 
+if result=5 call A_RDY 
+	
+:waitstr2
+waitln ':M ' ':E ' ':R ' ':T ' ':C ' ':Z ' ':H '
+
+	if result=1 filewriteln fhandle inputstr
+	if result=2 filewriteln fhandle inputstr
+	if result=3 filewriteln fhandle inputstr
+	if result=4 filewriteln fhandle inputstr
+       	if result=5 filewriteln fhandle inputstr
+
+	if result=6 then
+		pause 5
+		filewriteln fhandle inputstr
+		sendln ':A DON'
+		goto end
+	endif
+	if result=7 goto end	
+
+goto waitstr2
+
+:end
+fileclose fhandle
+clearscreen 1                         
+goto waitstr
+sendln EditCLB
+
+:A_RDY
+pause 5 
+sendln ':A RDY'
+strcopy inputstr 4 12 filename	
+filecreate fhandle filename
+filewriteln fhandle inputstr
+return
+
+; dial up
+
+;:dial
+;send   DialPrefix
+;sendln PhoneNumber
+
+; set timeout (30 sec)
+;timeout = 30
+
+; wait for strings from modem
+;wait 'CONNECT' 'BUSY' 'NO CARRIER'
+
+; pause 2 sec
+;pause 2
+
+; timeout?
+;if result=0 goto error
+
+; 'CONNECT'?
+;if result=1 goto conn
+
+; 'BUSY'?
+;if result=2 goto redial
+
+; 'NO CARRIER'
+;if result=3 goto error
+
+; error. stop macro
+;:error
+;messagebox 'Dialing error!' 'Tera Term'
+;end
+
+;:redial
+;yesnobox 'Busy! Try again?' 'Tera Term'
+;if result goto dial
+;end
+
+; connect!
+;:conn
+
+; login
+;wait   UsernamePrompt
+;sendln Username
+
+;wait   PasswordPrompt
+;sendln Password
+
+; OK, auto login complete.
